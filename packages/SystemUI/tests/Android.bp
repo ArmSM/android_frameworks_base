@@ -37,7 +37,8 @@ android_test {
     libs: [
         "android.test.runner.stubs.system",
         "telephony-common",
-        "android.test.base.stubs.system",
+        "android.test.base",
+        "ims-common",
     ],
     aaptflags: [
         "--extra-packages com.android.systemui",
