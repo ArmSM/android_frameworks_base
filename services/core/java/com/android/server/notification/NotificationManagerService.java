@@ -6746,6 +6746,15 @@ public class NotificationManagerService extends SystemService {
             Slog.e(TAG, "exiting pullStats: bad request");
             return 0;
         }
+
+         @Override
+        public void forceShowLedLight(int color) {
+            forceShowLed(color);
+        }
+        @Override
+        public void forcePulseLedLight(int color, int onTime, int offTime) {
+            forcePulseLed(color, onTime, offTime);
+        }
     };
 
     private void handleNotificationPermissionChange(String pkg, @UserIdInt int userId) {
@@ -6805,6 +6814,21 @@ public class NotificationManagerService extends SystemService {
                     handleSavePolicyFile();
                 }
             }
+        }
+    }
+
+    private void forceShowLed(int color) {
+        if (color != -1) {
+            mNotificationLight.setColor(color);
+        } else {
+            mNotificationLight.turnOff();
+        }
+    }
+    private void forcePulseLed(int color, int onTime, int offTime) {
+        if (color != -1) {
+            mNotificationLight.setFlashing(color, LogicalLight.LIGHT_FLASH_TIMED, onTime, offTime);
+        } else {
+            mNotificationLight.turnOff();
         }
     }
 
