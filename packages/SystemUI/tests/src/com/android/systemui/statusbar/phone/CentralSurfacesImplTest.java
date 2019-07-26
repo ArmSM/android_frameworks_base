@@ -383,6 +383,7 @@ public class CentralSurfacesImplTest extends SysuiTestCase {
 
         mVisualInterruptionDecisionProvider =
                 VisualInterruptionDecisionProviderTestUtil.INSTANCE.createProviderByFlag(
+                        mContext,
                         mAmbientDisplayConfiguration,
                         mBatteryController,
                         mDeviceProvisionedController,
@@ -1425,5 +1426,49 @@ public class CentralSurfacesImplTest extends SysuiTestCase {
                 ArgumentCaptor.forClass(StatusBarStateController.StateListener.class);
         verify(mStatusBarStateController).addCallback(callbackCaptor.capture(), anyInt());
         callbackCaptor.getValue().onDozingChanged(isDozing);
+    }
+
+    public static class TestableNotificationInterruptStateProviderImpl extends
+            NotificationInterruptStateProviderImpl {
+
+        TestableNotificationInterruptStateProviderImpl(
+                Context context,
+                PowerManager powerManager,
+                AmbientDisplayConfiguration ambientDisplayConfiguration,
+                StatusBarStateController controller,
+                KeyguardStateController keyguardStateController,
+                BatteryController batteryController,
+                HeadsUpManager headsUpManager,
+                NotificationInterruptLogger logger,
+                Handler mainHandler,
+                NotifPipelineFlags flags,
+                KeyguardNotificationVisibilityProvider keyguardNotificationVisibilityProvider,
+                UiEventLogger uiEventLogger,
+                UserTracker userTracker,
+                DeviceProvisionedController deviceProvisionedController,
+                SystemClock systemClock,
+                GlobalSettings globalSettings,
+                EventLog eventLog) {
+            super(
+                    context,
+                    powerManager,
+                    ambientDisplayConfiguration,
+                    batteryController,
+                    controller,
+                    keyguardStateController,
+                    headsUpManager,
+                    logger,
+                    mainHandler,
+                    flags,
+                    keyguardNotificationVisibilityProvider,
+                    uiEventLogger,
+                    userTracker,
+                    deviceProvisionedController,
+                    systemClock,
+                    globalSettings,
+                    eventLog
+            );
+            mUseHeadsUp = true;
+        }
     }
 }
