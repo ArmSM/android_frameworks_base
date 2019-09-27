@@ -2212,13 +2212,9 @@ public class NotificationManagerService extends SystemService {
                     false, this, USER_ALL);
 
             resolver.registerContentObserver(SHOW_NOTIFICATION_SNOOZE,
-<<<<<<< HEAD
                     false, this, USER_ALL);
-=======
-                    false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(NOTIFICATION_SOUND_VIB_SCREEN_ON,
                     false, this, UserHandle.USER_ALL);
->>>>>>> 9551621f8b8e (Allow to suppress notifications sound/vibration if screen is ON [1/2])
 
             update(null);
         }
