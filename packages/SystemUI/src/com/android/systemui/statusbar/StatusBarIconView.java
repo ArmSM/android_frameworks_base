@@ -41,6 +41,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.os.Trace;
 import android.os.UserHandle;
+import android.provider.Settings;
 import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 import android.util.FloatProperty;
@@ -185,6 +186,7 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
     private boolean mShowsConversation;
     private float mDozeAmount;
     private final NotificationDozeHelper mDozer;
+    private boolean mNewIconStyle;
 
     public StatusBarIconView(Context context, String slot, StatusBarNotification sbn) {
         this(context, slot, sbn, false);
@@ -395,6 +397,11 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
                 return false;
         }
     }
+
+    public void setIconStyle(boolean iconStyle) {
+        mNewIconStyle = iconStyle;
+    }
+
     /**
      * Returns whether the set succeeded.
      */
@@ -478,7 +485,20 @@ public class StatusBarIconView extends AnimatedImageView implements StatusIconDi
      */
     private Drawable getIcon(Context sysuiContext,
             Context context, StatusBarIcon statusBarIcon) {
-        Drawable icon = loadDrawable(context, statusBarIcon);
+        int userId = statusBarIcon.user.getIdentifier();
+        if (userId == UserHandle.USER_ALL) {
+            userId = UserHandle.USER_SYSTEM;
+        }
+
+        Drawable icon;
+        String pkgName = statusBarIcon.pkg;
+        try {
+            icon = pkgName.contains("systemui") || !mNewIconStyle ?
+                                statusBarIcon.icon.loadDrawableAsUser(context, userId)
+                               : context.getPackageManager().getApplicationIcon(pkgName);
+        } catch (android.content.pm.PackageManager.NameNotFoundException e) {
+            icon = statusBarIcon.icon.loadDrawableAsUser(context, userId);
+        }
 
         TypedValue typedValue = new TypedValue();
         sysuiContext.getResources().getValue(R.dimen.status_bar_icon_scale_factor,
