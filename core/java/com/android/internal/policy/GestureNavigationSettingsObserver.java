@@ -159,6 +159,11 @@ public class GestureNavigationSettingsObserver extends ContentObserver {
         return (int) (getUnscaledInset(userRes) * scale);
     }
 
+    public boolean getBackArrowGesture() {
+        return Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                Settings.Secure.BACK_GESTURE_ARROW, 1, UserHandle.USER_CURRENT) != 0;
+    }
+
     public boolean areNavigationButtonForcedVisible() {
         return Settings.Secure.getIntForUser(mContext.getContentResolver(),
                 Settings.Secure.USER_SETUP_COMPLETE, 0, UserHandle.USER_CURRENT) == 0;
