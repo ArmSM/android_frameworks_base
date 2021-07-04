@@ -199,6 +199,8 @@ public abstract class AuthBiometricView extends LinearLayout {
     protected boolean mDialogSizeAnimating;
     protected Bundle mSavedState;
 
+    protected final PackageManager mPackageManager;
+
     /**
      * Delay after authentication is confirmed, before the dialog should be animated away.
      */
@@ -258,6 +260,8 @@ public abstract class AuthBiometricView extends LinearLayout {
 
         mInjector = injector;
         mInjector.mBiometricView = this;
+
+	mPackageManager = context.getPackageManager();
 
         mAccessibilityManager = context.getSystemService(AccessibilityManager.class);
 
