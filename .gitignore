@@ -3,4 +3,7 @@
 *.sw*
 gen/
 .project
-.settings/
+.settings
+.classpath
+.gradle
+bin/
