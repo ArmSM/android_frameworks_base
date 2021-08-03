@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Scrolling Screenshot string -->
+    <string name="scrollss">સ્ક્રોલ</string>
+    <!-- Time displayed on typographic clock face, which displays the time in words.
+             Example:
+                 It's
+                 Four
+                 Twenty Nine
+         This string requires two arguments: the first in the hours of the time and
+         the second is the minutes of the time. The hours string is obtained from
+         string-array type_clock_hours below and the minutes string is obtained
+         from string-array type_clock_minutes below.
+    [CHAR LIMIT=8] -->
+    <plurals name="type_clock_header">
+        <item quantity="other"><annotation name="color">આ</annotation>\n^1\n^2</item>
+        <item quantity="one"><annotation name="color">આ</annotation>\n^1\n^2</item>
+    </plurals>
+    <!-- Hour displayed in words on the typographic clock face. [CHAR LIMIT=12] -->
+    <string name="text_clock_h_one">એક</string>
+    <string name="text_clock_h_two">બે</string>
+    <string name="text_clock_h_three">ત્રણ</string>
+    <string name="text_clock_h_four">ચાર</string>
+    <string name="text_clock_h_five">પાંચ</string>
+    <string name="text_clock_h_six">છ</string>
+    <string name="text_clock_h_seven">સાત</string>
+    <string name="text_clock_h_eight">આઠ</string>
+    <string name="text_clock_h_nine">નવ</string>
+    <string name="text_clock_h_ten">દસ</string>
+    <string name="text_clock_h_eleven">અગિયાર</string>
+    <string name="text_clock_h_twelve">બાર</string>
+    <!-- Minutes displayed in words on the typographic clock face. [CHAR LIMIT=20] -->
+    <string name="text_clock_m_zero">વાગ્યે</string>
+    <string name="text_clock_m_one">એક વાગ્યે</string>
+    <string name="text_clock_m_two">બે વાગ્યે</string>
+    <string name="text_clock_m_three">ત્રણ વાગ્યે</string>
+    <string name="text_clock_m_four">ચાર વાગ્યે</string>
+    <string name="text_clock_m_five">પાંચ વાગ્યે</string>
+    <string name="text_clock_m_six">છ વાગ્યે</string>
+    <string name="text_clock_m_seven">સાત વાગ્યે</string>
+    <string name="text_clock_m_eight">આઠ વાગ્યે</string>
+    <string name="text_clock_m_nine">નવ વાગ્યે</string>
+    <string name="text_clock_m_ten">દશ</string>
+    <string name="text_clock_m_eleven">અગિયાર</string>
+    <string name="text_clock_m_twelve">બાર</string>
+    <string name="text_clock_m_thirteen">તેર</string>
+    <string name="text_clock_m_fourteen">ચૌદ</string>
+    <string name="text_clock_m_fifteen">પંદર</string>
+    <string name="text_clock_m_sixteen">સોળ</string>
+    <string name="text_clock_m_seventeen">સત્તર</string>
+    <string name="text_clock_m_eighteen">અઢાર</string>
+    <string name="text_clock_m_nineteen">ઓગણીસ</string>
+    <string name="text_clock_m_twenty">વીસ</string>
+    <string name="text_clock_m_twenty_one">એકવીસ</string>
+    <string name="text_clock_m_twenty_two">બાવીસ</string>
+    <string name="text_clock_m_twenty_three">ત્રેવીસ</string>
+    <string name="text_clock_m_twenty_four">ચોવીસ</string>
+    <string name="text_clock_m_twenty_five">પચ્ચીસ</string>
+    <string name="text_clock_m_twenty_six">છવ્વીસ</string>
+    <string name="text_clock_m_twenty_seven">સત્યાવીસ</string>
+    <string name="text_clock_m_twenty_eight">અઠ્ઠયાવીસ</string>
+    <string name="text_clock_m_twenty_nine">ઓગણત્રીસ</string>
+    <string name="text_clock_m_thirty">ત્રીસ</string>
+    <string name="text_clock_m_thirty_one">એકત્રીસ</string>
+    <string name="text_clock_m_thirty_two">બત્રીસ</string>
+    <string name="text_clock_m_thirty_three">તેત્રીસ</string>
+    <string name="text_clock_m_thirty_four">ચોત્રીસ</string>
+    <string name="text_clock_m_thirty_five">પાંત્રીસ</string>
+    <string name="text_clock_m_thirty_six">છત્રીસ</string>
+    <string name="text_clock_m_thirty_seven">સાડત્રીસ</string>
+    <string name="text_clock_m_thirty_eight">આડત્રીસ</string>
+    <string name="text_clock_m_thirty_nine">ઓગણચાલીસ</string>
+    <string name="text_clock_m_forty">ચાલીસ</string>
+    <string name="text_clock_m_forty_one">એકતાળીસ</string>
+    <string name="text_clock_m_forty_two">બેતાલીસ</string>
+    <string name="text_clock_m_forty_three">તેતાલીસ</string>
+    <string name="text_clock_m_forty_four">ચુમાલીસ</string>
+    <string name="text_clock_m_forty_five">પિસ્તાળીસ</string>
+    <string name="text_clock_m_forty_six">છેંતાલીસ</string>
+    <string name="text_clock_m_forty_seven">સુડતાળીસ</string>
+    <string name="text_clock_m_forty_eight">અડતાલીસ</string>
+    <string name="text_clock_m_forty_nine">ઓગણપચાસ</string>
+    <string name="text_clock_m_fifty">પચાસ</string>
+    <string name="text_clock_m_fifty_one">એકાવન</string>
+    <string name="text_clock_m_fifty_two">બાવન</string>
+    <string name="text_clock_m_fifty_three">ત્રેપન</string>
+    <string name="text_clock_m_fifty_four">ચોપન</string>
+    <string name="text_clock_m_fifty_five">પંચાવન</string>
+    <string name="text_clock_m_fifty_six">છપ્પન</string>
+    <string name="text_clock_m_fifty_seven">સત્તાવન</string>
+    <string name="text_clock_m_fifty_eight">અઠ્ઠાવન</string>
+    <string name="text_clock_m_fifty_nine">ઓગણસાઠ</string>
+    <!-- Binary clock -->
+    <!-- Samsung clock -->
+    <!-- Tux clock -->
+    <!-- Oroño clock -->
+    <string name="date_long_title_today">આજે %s છે</string>
+    <!-- App Lock -->
+    <string name="applock_unlock">એપ અનલોક કરો</string>
+    <!-- Daily data usage -->
+    <string name="daily_data_usage_title">આજનો વપરાશ</string>
+    <!-- QS customizer -->
+    <string name="drag_or_tap_to_add_tiles">ટાઈલ્સ ઉમેરવા/દૂર કરવા ખસેડો અથવા ટેપ કરો</string>
+    <!-- Biometric Dialog - Use Face -->
+    <string name="biometric_dialog_button_use_face">ચહેરો વાપરો</string>
+    <!-- Kill button in notification guts -->
+    <string name="force_stop_dlg_title">બળજબરી પૂર્વક રોકીએ?</string>
+    <string name="force_stop_dlg_text">જો તમે એપને બળજબરી પૂર્વક રોકશો તો તે કદાચ ગેરવર્તન કરશે.</string>
+    <string name="guts_force_close_app">ઍપ્લિકેશન બંધ કરો</string>
+    <!-- Screenrecorder -->
+    <string name="screenrecord_stopdot_label">દેખાડો રોકો બિંદુ\nખસેડવા માટે લાંબીવાર સુધી દબાવો</string>
+    <string name="screenrecord_lowquality_label">નાની કદની ફાઈલ માટે નીચી ગુણવત્તા</string>
+</resources>
