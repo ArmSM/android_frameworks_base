@@ -110,4 +110,6 @@
     <!-- Screenrecorder -->
     <string name="screenrecord_stopdot_label">દેખાડો રોકો બિંદુ\nખસેડવા માટે લાંબીવાર સુધી દબાવો</string>
     <string name="screenrecord_lowquality_label">નાની કદની ફાઈલ માટે નીચી ગુણવત્તા</string>
+    <!-- Accessibility label for nfc icon (not shown on screen) [CHAR LIMIT=NONE] -->
+    <string name="accessibility_status_bar_nfc">Nfc</string>
 </resources>
