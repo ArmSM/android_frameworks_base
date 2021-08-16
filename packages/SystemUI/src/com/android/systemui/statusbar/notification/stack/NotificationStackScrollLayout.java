@@ -5807,6 +5807,10 @@ public class NotificationStackScrollLayout extends ViewGroup implements ScrollAd
     protected void inflateFooterView() {
         FooterView footerView = (FooterView) LayoutInflater.from(mContext).inflate(
                 R.layout.status_bar_notification_footer, this, false);
+	footerView.setDismissButtonClickListener(v -> {
+            mMetricsLogger.action(MetricsEvent.ACTION_DISMISS_ALL_NOTES);
+            clearNotifications(ROWS_ALL, true /* closeShade */);
+        });
         footerView.setManageButtonClickListener(v -> {
             mNotificationActivityStarter.startHistoryIntent(mFooterView.isHistoryShown());
         });
