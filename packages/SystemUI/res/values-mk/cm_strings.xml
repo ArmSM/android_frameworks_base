@@ -2,7 +2,7 @@
 <!--
 /**
  * Copyright (c) 2015, The CyanogenMod Project
- * Copyright (c) 2017-2019, The LineageOS Project
+ * Copyright (c) 2017-2021 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,5 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="global_action_restart_system">Систем</string>
 
-    <!-- Bottom margin size when fingerprint in display is active -->
-    <dimen name="keyguard_indication_margin_bottom_fingerprint_in_display">@dimen/keyguard_indication_margin_bottom</dimen>
-
-    <!-- Pixel navbar -->
-    <dimen name="opa_diamond_translation">16dp</dimen>
-    <dimen name="opa_disabled_home_diameter">@dimen/navigation_icon_size</dimen>
-    <dimen name="opa_dot_diam">10dp</dimen>
-    <dimen name="opa_line_x_trans_bg">30dp</dimen>
-    <dimen name="opa_line_x_trans_ry">15dp</dimen>
-    <dimen name="opa_line_y_translation">16dp</dimen>
-
-    <!-- Color for the Assistant invocation lights -->
-    <color name="edge_light_blue">#4185f4</color>
-    <color name="edge_light_green">#3aa853</color>
-    <color name="edge_light_red">#ea4234</color>
-    <color name="edge_light_yellow">#fbbc06</color>
-
+    <string name="status_bar_location">Локација</string>
 </resources>

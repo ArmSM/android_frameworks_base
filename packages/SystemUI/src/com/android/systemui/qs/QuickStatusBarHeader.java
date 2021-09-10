@@ -808,6 +808,9 @@ public class QuickStatusBarHeader extends RelativeLayout implements
         } else if (v == mBatteryRemainingIcon || v == mBatteryMeterView) {
             mActivityStarter.postStartActivityDismissingKeyguard(new Intent(
                 Intent.ACTION_POWER_USAGE_SUMMARY), 0);
+        } else if (v == mBatteryRemainingIcon) {
+            mActivityStarter.postStartActivityDismissingKeyguard(new Intent(
+                    Intent.ACTION_POWER_USAGE_SUMMARY), 0);
         }
     }
 
