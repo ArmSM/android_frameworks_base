@@ -98,6 +98,18 @@ public class PixelPropsUtils {
         propsToChange.put("IS_USERDEBUG", false);
         propsToChange.put("IS_USER", true);
         propsToChange.put("TYPE", "user");
+        propsToChangePixelXL = new HashMap<>();
+        propsToChangePixelXL.put("BRAND", "google");
+        propsToChangePixelXL.put("MANUFACTURER", "Google");
+        propsToChangePixelXL.put("DEVICE", "marlin");
+        propsToChangePixelXL.put("PRODUCT", "marlin");
+        propsToChangePixelXL.put("MODEL", "Pixel XL");
+        propsToChangePixelXL.put("FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys");
+        propsToChangePixelXL.put("IS_DEBUGGABLE", false);
+        propsToChangePixelXL.put("IS_ENG", false);
+        propsToChangePixelXL.put("IS_USERDEBUG", false);
+        propsToChangePixelXL.put("IS_USER", true);
+        propsToChangePixelXL.put("TYPE", "user");
         propsToChangePixel3XL = new HashMap<>();
         propsToChangePixel3XL.put("BRAND", "google");
         propsToChangePixel3XL.put("MANUFACTURER", "Google");
@@ -110,18 +122,6 @@ public class PixelPropsUtils {
         propsToChangePixel3XL.put("IS_USERDEBUG", false);
         propsToChangePixel3XL.put("IS_USER", true);
         propsToChangePixel3XL.put("TYPE", "user");
-        propsToChangeOGPixelXL = new HashMap<>();
-        propsToChangeOGPixelXL.put("BRAND", "google");
-        propsToChangeOGPixelXL.put("MANUFACTURER", "Google");
-        propsToChangeOGPixelXL.put("DEVICE", "marlin");
-        propsToChangeOGPixelXL.put("PRODUCT", "marlin");
-        propsToChangeOGPixelXL.put("MODEL", "Pixel XL");
-        propsToChangeOGPixelXL.put("FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys");
-        propsToChangeOGPixelXL.put("IS_DEBUGGABLE", false);
-        propsToChangeOGPixelXL.put("IS_ENG", false);
-        propsToChangeOGPixelXL.put("IS_USERDEBUG", false);
-        propsToChangeOGPixelXL.put("IS_USER", true);
-        propsToChangeOGPixelXL.put("TYPE", "user");
     }
 
     public static void setProps(String packageName) {
