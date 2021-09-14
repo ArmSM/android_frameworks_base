@@ -951,14 +951,15 @@ public class QuickStatusBarHeader extends RelativeLayout implements
         } else if (StatusBarIconController.ICON_BLACKLIST.equals(key)) {
             mClockView.setClockVisibleByUser(!StatusBarIconController.getIconBlacklist(
                     mContext, newValue).contains("clock"));
-        }
+        } else {
+	    onTuningChanged2(key, newValue);
+	}
     }
     private void updateStatusbarProperties() {
         mBatteryMeterView.useWallpaperTextColor(mLandscape);
     }
 
-    @Override
-    public void onTuningChanged(String key, String newValue) {
+    private void onTuningChanged2(String key, String newValue) {
         switch (key) {
             case QS_DATAUSAGE:
                 mQSDataUsage =
