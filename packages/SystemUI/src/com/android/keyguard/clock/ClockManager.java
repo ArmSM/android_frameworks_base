@@ -171,7 +171,6 @@ public final class ClockManager {
         addBuiltinClock(() -> new IDEJavaClockController(res, layoutInflater, colorExtractor, context));
         addBuiltinClock(() -> new ClockertinoClockController(res, layoutInflater, colorExtractor, context));
         addBuiltinClock(() -> new TypeAltClockController(res, layoutInflater, colorExtractor, context));
-        addBuiltinClock(() -> new GradientFireClockController(res, layoutInflater, colorExtractor));
         addBuiltinClock(() -> new StickerTagClockController(res, layoutInflater, colorExtractor, context));
         addBuiltinClock(() -> new Fluidv2ClockController(res, layoutInflater, colorExtractor, context));
         addBuiltinClock(() -> new AndroidSClockController(res, layoutInflater, colorExtractor));
