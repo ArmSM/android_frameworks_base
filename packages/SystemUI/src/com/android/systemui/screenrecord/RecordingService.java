@@ -216,16 +216,16 @@ public class RecordingService extends Service implements MediaRecorder.OnInfoLis
         int mCurrentUserId = mUserContextTracker.getCurrentUserContext().getUserId();
         Log.d(TAG, "recording with audio source" + audioSource);
         mOriginalShowTaps = Settings.System.getInt(getApplicationContext().getContentResolver(), Settings.System.SHOW_TOUCHES, 0) != 0;
-        setTapsVisible(mShowTaps);
-        setStopDotVisible(mShowStopDot);
+        setTapsVisible(showTaps);
+        setStopDotVisible(showStopDot);
         
         mRecorder = new ScreenMediaRecorder(
                         mUserContextTracker.getCurrentUserContext(),
                         mCurrentUserId,
-                        mAudioSource,
+                        ScreenRecordingAudioSource.values()[audioSource],
                         this
        );
-       setLowQuality(mLowQuality);
+       setLowQuality(lowQuality);
        startRecording();
     }
 
