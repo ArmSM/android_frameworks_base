@@ -173,9 +173,9 @@ public final class ClockManager {
         addBuiltinClock(() -> new TypeAltClockController(res, layoutInflater, colorExtractor, context));
         addBuiltinClock(() -> new StickerTagClockController(res, layoutInflater, colorExtractor, context));
         addBuiltinClock(() -> new Fluidv2ClockController(res, layoutInflater, colorExtractor, context));
-        addBuiltinClock(() -> new AndroidSClockController(res, layoutInflater, colorExtractor));
-        addBuiltinClock(() -> new AndroidSDP3ClockController(res, layoutInflater, colorExtractor));
-        addBuiltinClock(() -> new OctaviDigitalClockController(res, layoutInflater, colorExtractor));
+        addBuiltinClock(() -> new AndroidSClockController(res, layoutInflater, colorExtractor, context));
+        addBuiltinClock(() -> new AndroidSDP3ClockController(res, layoutInflater, colorExtractor, context));
+        addBuiltinClock(() -> new OctaviDigitalClockController(res, layoutInflater, colorExtractor, context));
 
         DisplayMetrics dm = res.getDisplayMetrics();
         mWidth = dm.widthPixels;
