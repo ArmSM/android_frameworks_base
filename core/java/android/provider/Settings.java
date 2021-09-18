@@ -5032,13 +5032,6 @@ public final class Settings {
          */
         public static final String SHOW_CPU_OVERLAY = "show_cpu_overlay";
 
-
-        /**
-         * Whether to show the battery info on the lockscreen while charging
-         * @hide
-         */
-        public static final String LOCKSCREEN_BATTERY_INFO = "lockscreen_battery_info";
-
         /**
          * @hide
          */
@@ -5350,7 +5343,6 @@ public final class Settings {
             PRIVATE_SETTINGS.add(AMBIENT_NOTIFICATION_LIGHT);
             PRIVATE_SETTINGS.add(AMBIENT_NOTIFICATION_LIGHT_AUTOMATIC);
    	    PRIVATE_SETTINGS.add(QS_PANEL_BG_USE_NEW_TINT);
-            PRIVATE_SETTINGS.add(LOCKSCREEN_BATTERY_INFO);
         }
 
         /**
