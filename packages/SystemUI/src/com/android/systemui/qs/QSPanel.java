@@ -63,6 +63,14 @@ public class QSPanel extends LinearLayout implements Tunable {
             "lineagesecure:" + LineageSettings.Secure.QS_SHOW_BRIGHTNESS_SLIDER;
     public static final String QS_BRIGHTNESS_SLIDER_POSITION =
             "lineagesecure:" + LineageSettings.Secure.QS_BRIGHTNESS_SLIDER_POSITION;
+    public static final String QS_TILE_VERTICAL_LAYOUT =
+            "system:" + Settings.System.QS_TILE_VERTICAL_LAYOUT;
+    public static final String QS_TILE_LABEL_HIDE =
+            "system:" + Settings.System.QS_TILE_LABEL_HIDE;
+    public static final String QS_LAYOUT_COLUMNS =
+            "system:" + Settings.System.QS_LAYOUT_COLUMNS;
+    public static final String QS_LAYOUT_COLUMNS_LANDSCAPE =
+            "system:" + Settings.System.QS_LAYOUT_COLUMNS_LANDSCAPE;
 
     private static final String TAG = "QSPanel";
 
@@ -388,6 +396,10 @@ public class QSPanel extends LinearLayout implements Tunable {
                             TunerService.parseIntegerSwitch(newValue, true) ? View.VISIBLE : View.GONE);
                 }
                 break;
+            case QS_LAYOUT_COLUMNS:
+            case QS_LAYOUT_COLUMNS_LANDSCAPE:
+                needsDynamicRowsAndColumns();
+                break;
             default:
                 break;
          }
@@ -467,6 +479,7 @@ public class QSPanel extends LinearLayout implements Tunable {
         super.onConfigurationChanged(newConfig);
         mOnConfigurationChangedListeners.forEach(
                 listener -> listener.onConfigurationChange(newConfig));
+        needsDynamicRowsAndColumns();
     }
 
     @Override
@@ -501,8 +514,12 @@ public class QSPanel extends LinearLayout implements Tunable {
         return false;
     }
 
-    private boolean needsDynamicRowsAndColumns() {
-        return !SceneContainerFlag.isEnabled();
+    public void needsDynamicRowsAndColumns() {
+        if (mTileLayout != null) {
+            int columns = mTileLayout.getResourceColumns();
+            mTileLayout.setMinRows(mUsingHorizontalLayout ? 2 : 1);
+            mTileLayout.setMaxColumns(columns > 3 && mUsingHorizontalLayout ? columns / 2 : columns);
+        }
     }
 
     private void switchAllContentToParent(ViewGroup parent, QSTileLayout newLayout) {
@@ -707,9 +724,7 @@ public class QSPanel extends LinearLayout implements Tunable {
             if (SceneContainerFlag.isEnabled()) return;
             switchAllContentToParent(newParent, mTileLayout);
             reAttachMediaHost(mediaHostView, horizontal);
-            if (needsDynamicRowsAndColumns()) {
-                setColumnRowLayout(horizontal);
-            }
+            needsDynamicRowsAndColumns();
             updateMargins(mediaHostView);
             if (mHorizontalLinearLayout != null) {
                 mHorizontalLinearLayout.setVisibility(horizontal ? View.VISIBLE : View.GONE);
@@ -890,6 +905,10 @@ public class QSPanel extends LinearLayout implements Tunable {
         int getNumVisibleTiles();
 
         default void setLogger(QSLogger qsLogger) { }
+
+        int getResourceColumns();
+
+        void updateSettings();
     }
 
     interface OnConfigurationChangedListener {
