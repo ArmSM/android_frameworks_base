@@ -768,6 +768,7 @@ public class NotificationManagerService extends SystemService {
     private AppOpsManager.OnOpChangedListener mAppOpsListener;
 
     private ModuleInfo mAdservicesModuleInfo;
+    private boolean mSoundVibScreenOn;
 
     static class Archive {
         final SparseArray<Boolean> mEnabled;
@@ -2185,6 +2186,8 @@ public class NotificationManagerService extends SystemService {
                 = Secure.getUriFor(Secure.LOCK_SCREEN_SHOW_NOTIFICATIONS);
         private final Uri SHOW_NOTIFICATION_SNOOZE
                 = Secure.getUriFor(Secure.SHOW_NOTIFICATION_SNOOZE);
+        private final Uri NOTIFICATION_SOUND_VIB_SCREEN_ON
+                = Settings.System.getUriFor(Settings.System.NOTIFICATION_SOUND_VIB_SCREEN_ON);
 
         SettingsObserver(Handler handler) {
             super(handler);
@@ -2209,7 +2212,13 @@ public class NotificationManagerService extends SystemService {
                     false, this, USER_ALL);
 
             resolver.registerContentObserver(SHOW_NOTIFICATION_SNOOZE,
+<<<<<<< HEAD
                     false, this, USER_ALL);
+=======
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(NOTIFICATION_SOUND_VIB_SCREEN_ON,
+                    false, this, UserHandle.USER_ALL);
+>>>>>>> 9551621f8b8e (Allow to suppress notifications sound/vibration if screen is ON [1/2])
 
             update(null);
         }
@@ -2255,6 +2264,11 @@ public class NotificationManagerService extends SystemService {
                 if (!snoozeEnabled) {
                     unsnoozeAll();
                 }
+            }
+            if (uri == null || NOTIFICATION_SOUND_VIB_SCREEN_ON.equals(uri)) {
+                mSoundVibScreenOn = Settings.System.getIntForUser(resolver,
+                        Settings.System.NOTIFICATION_SOUND_VIB_SCREEN_ON, 1,
+                        UserHandle.USER_CURRENT) == 1;
             }
         }
 
@@ -9538,6 +9552,449 @@ public class NotificationManagerService extends SystemService {
                 record, PendingIntent.FLAG_CANCEL_CURRENT);
         if (pi != null) {
             mAlarmManager.cancel(pi);
+        }
+    }
+
+    @VisibleForTesting
+    @GuardedBy("mNotificationLock")
+    /**
+     * Determine whether this notification should attempt to make noise, vibrate, or flash the LED
+     * @return buzzBeepBlink - bitfield (buzz ? 1 : 0) | (beep ? 2 : 0) | (blink ? 4 : 0)
+     */
+    int buzzBeepBlinkLocked(NotificationRecord record) {
+        if (mIsAutomotive && !mNotificationEffectsEnabledForAutomotive) {
+            return 0;
+        }
+        boolean buzz = false;
+        boolean beep = false;
+        boolean blink = false;
+
+        final String key = record.getKey();
+
+        // Should this notification make noise, vibe, or use the LED?
+        final boolean aboveThreshold =
+                mIsAutomotive
+                        ? record.getImportance() > NotificationManager.IMPORTANCE_DEFAULT
+                        : record.getImportance() >= NotificationManager.IMPORTANCE_DEFAULT;
+        // Remember if this notification already owns the notification channels.
+        boolean wasBeep = key != null && key.equals(mSoundNotificationKey);
+        boolean wasBuzz = key != null && key.equals(mVibrateNotificationKey);
+        // These are set inside the conditional if the notification is allowed to make noise.
+        boolean hasValidVibrate = false;
+        boolean hasValidSound = false;
+        boolean sentAccessibilityEvent = false;
+
+        // If the notification will appear in the status bar, it should send an accessibility event
+        final boolean suppressedByDnd = record.isIntercepted()
+                && (record.getSuppressedVisualEffects() & SUPPRESSED_EFFECT_STATUS_BAR) != 0;
+        if (!record.isUpdate
+                && record.getImportance() > IMPORTANCE_MIN
+                && !suppressedByDnd
+                && isNotificationForCurrentUser(record)) {
+            sendAccessibilityEvent(record);
+            sentAccessibilityEvent = true;
+        }
+
+        if (aboveThreshold && isNotificationForCurrentUser(record)) {
+            boolean skipSound = mScreenOn && !mSoundVibScreenOn;
+            if (mSystemReady && mAudioManager != null && !skipSound) {
+                Uri soundUri = record.getSound();
+                hasValidSound = soundUri != null && !Uri.EMPTY.equals(soundUri);
+                VibrationEffect vibration = record.getVibration();
+                // Demote sound to vibration if vibration missing & phone in vibration mode.
+                if (vibration == null
+                        && hasValidSound
+                        && (mAudioManager.getRingerModeInternal()
+                        == AudioManager.RINGER_MODE_VIBRATE)
+                        && mAudioManager.getStreamVolume(
+                        AudioAttributes.toLegacyStreamType(record.getAudioAttributes())) == 0) {
+                    boolean insistent = (record.getFlags() & Notification.FLAG_INSISTENT) != 0;
+                    vibration = mVibratorHelper.createFallbackVibration(insistent);
+                }
+                hasValidVibrate = vibration != null;
+                boolean hasAudibleAlert = hasValidSound || hasValidVibrate;
+                if (hasAudibleAlert && !shouldMuteNotificationLocked(record)
+                        && !isInSoundTimeoutPeriod(record)) {
+                    if (!sentAccessibilityEvent) {
+                        sendAccessibilityEvent(record);
+                        sentAccessibilityEvent = true;
+                    }
+                    if (DBG) Slog.v(TAG, "Interrupting!");
+                    boolean isInsistentUpdate = isInsistentUpdate(record);
+                    if (hasValidSound) {
+                        if (isInsistentUpdate) {
+                            // don't reset insistent sound, it's jarring
+                            beep = true;
+                        } else {
+                            if (isInCall()) {
+                                playInCallNotification();
+                                beep = true;
+                            } else {
+                                beep = playSound(record, soundUri);
+                            }
+                            if (beep) {
+                                mSoundNotificationKey = key;
+                            }
+                        }
+                    }
+
+                    final boolean ringerModeSilent =
+                            mAudioManager.getRingerModeInternal()
+                                    == AudioManager.RINGER_MODE_SILENT;
+                    if (!isInCall() && hasValidVibrate && !ringerModeSilent) {
+                        if (isInsistentUpdate) {
+                            buzz = true;
+                        } else {
+                            buzz = playVibration(record, vibration, hasValidSound);
+                            if (buzz) {
+                                mVibrateNotificationKey = key;
+                            }
+                        }
+                    }
+
+                    // Try to start flash notification event whenever an audible and non-suppressed
+                    // notification is received
+                    mAccessibilityManager.startFlashNotificationEvent(getContext(),
+                            AccessibilityManager.FLASH_REASON_NOTIFICATION,
+                            record.getSbn().getPackageName());
+
+                } else if ((record.getFlags() & Notification.FLAG_INSISTENT) != 0) {
+                    hasValidSound = false;
+                }
+            }
+        }
+        // If a notification is updated to remove the actively playing sound or vibrate,
+        // cancel that feedback now
+        if (wasBeep && !hasValidSound) {
+            clearSoundLocked();
+        }
+        if (wasBuzz && !hasValidVibrate) {
+            clearVibrateLocked();
+        }
+
+        // light
+        // release the light
+        boolean wasShowLights = mLights.remove(key);
+        if (canShowLightsLocked(record, aboveThreshold)) {
+            mLights.add(key);
+            updateLightsLocked();
+            if (mUseAttentionLight && mAttentionLight != null) {
+                mAttentionLight.pulse();
+            }
+            blink = true;
+        } else if (wasShowLights) {
+            updateLightsLocked();
+        }
+        if (buzz || beep) {
+            mLastSoundTimestamps.put(generateLastSoundTimeoutKey(record),
+                    SystemClock.elapsedRealtime());
+        }
+        final int buzzBeepBlink = (buzz ? 1 : 0) | (beep ? 2 : 0) | (blink ? 4 : 0);
+        if (buzzBeepBlink > 0) {
+            // Ignore summary updates because we don't display most of the information.
+            if (record.getSbn().isGroup() && record.getSbn().getNotification().isGroupSummary()) {
+                if (DEBUG_INTERRUPTIVENESS) {
+                    Slog.v(TAG, "INTERRUPTIVENESS: "
+                            + record.getKey() + " is not interruptive: summary");
+                }
+            } else if (record.canBubble()) {
+                if (DEBUG_INTERRUPTIVENESS) {
+                    Slog.v(TAG, "INTERRUPTIVENESS: "
+                            + record.getKey() + " is not interruptive: bubble");
+                }
+            } else {
+                record.setInterruptive(true);
+                if (DEBUG_INTERRUPTIVENESS) {
+                    Slog.v(TAG, "INTERRUPTIVENESS: "
+                            + record.getKey() + " is interruptive: alerted");
+                }
+            }
+            MetricsLogger.action(record.getLogMaker()
+                    .setCategory(MetricsEvent.NOTIFICATION_ALERT)
+                    .setType(MetricsEvent.TYPE_OPEN)
+                    .setSubtype(buzzBeepBlink));
+            EventLogTags.writeNotificationAlert(key, buzz ? 1 : 0, beep ? 1 : 0, blink ? 1 : 0, 0);
+        }
+        record.setAudiblyAlerted(buzz || beep);
+        return buzzBeepBlink;
+    }
+
+    private boolean isInSoundTimeoutPeriod(NotificationRecord record) {
+        long timeoutMillis = mPreferencesHelper.getNotificationSoundTimeout(
+                record.getSbn().getPackageName(), record.getSbn().getUid());
+        if (timeoutMillis == 0) {
+            return false;
+        }
+
+        Long value = mLastSoundTimestamps.get(generateLastSoundTimeoutKey(record));
+        if (value == null) {
+            return false;
+        }
+        return SystemClock.elapsedRealtime() - value < timeoutMillis;
+    }
+
+    private String generateLastSoundTimeoutKey(NotificationRecord record) {
+        return record.getSbn().getPackageName() + "|" + record.getSbn().getUid();
+    }
+
+    @GuardedBy("mNotificationLock")
+    boolean canShowLightsLocked(final NotificationRecord record, boolean aboveThreshold) {
+        // device lacks light
+        if (!mHasLight) {
+            return false;
+        }
+        // user turned lights off globally
+        if (!mNotificationPulseEnabled) {
+            return false;
+        }
+        // the notification/channel has no light
+        if (record.getLight() == null) {
+            return false;
+        }
+        // unimportant notification
+        if (!aboveThreshold) {
+            return false;
+        }
+        // suppressed due to DND
+        if ((record.getSuppressedVisualEffects() & SUPPRESSED_EFFECT_LIGHTS) != 0) {
+            return false;
+        }
+        // Suppressed because it's a silent update
+        final Notification notification = record.getNotification();
+        if (record.isUpdate && (notification.flags & FLAG_ONLY_ALERT_ONCE) != 0) {
+            return false;
+        }
+        // Suppressed because another notification in its group handles alerting
+        if (record.getSbn().isGroup() && record.getNotification().suppressAlertingDueToGrouping()) {
+            return false;
+        }
+        // not if in call
+        if (isInCall()) {
+            return false;
+        }
+        // check current user
+        if (!isNotificationForCurrentUser(record)) {
+            return false;
+        }
+        // Light, but only when the screen is off
+        return true;
+    }
+
+    @GuardedBy("mNotificationLock")
+    boolean isInsistentUpdate(final NotificationRecord record) {
+        return (Objects.equals(record.getKey(), mSoundNotificationKey)
+                || Objects.equals(record.getKey(), mVibrateNotificationKey))
+                && isCurrentlyInsistent();
+    }
+
+    @GuardedBy("mNotificationLock")
+    boolean isCurrentlyInsistent() {
+        return isLoopingRingtoneNotification(mNotificationsByKey.get(mSoundNotificationKey))
+                || isLoopingRingtoneNotification(mNotificationsByKey.get(mVibrateNotificationKey));
+    }
+
+    @GuardedBy("mNotificationLock")
+    boolean shouldMuteNotificationLocked(final NotificationRecord record) {
+        // Suppressed because it's a silent update
+        final Notification notification = record.getNotification();
+        if (record.isUpdate && (notification.flags & FLAG_ONLY_ALERT_ONCE) != 0) {
+            return true;
+        }
+
+        // Suppressed because a user manually unsnoozed something (or similar)
+        if (record.shouldPostSilently()) {
+            return true;
+        }
+
+        // muted by listener
+        final String disableEffects = disableNotificationEffects(record);
+        if (disableEffects != null) {
+            ZenLog.traceDisableEffects(record, disableEffects);
+            return true;
+        }
+
+        // suppressed due to DND
+        if (record.isIntercepted()) {
+            return true;
+        }
+
+        // Suppressed because another notification in its group handles alerting
+        if (record.getSbn().isGroup()) {
+            if (notification.suppressAlertingDueToGrouping()) {
+                return true;
+            }
+        }
+
+        // Suppressed for being too recently noisy
+        final String pkg = record.getSbn().getPackageName();
+        if (mUsageStats.isAlertRateLimited(pkg)) {
+            Slog.e(TAG, "Muting recently noisy " + record.getKey());
+            return true;
+        }
+
+        // A different looping ringtone, such as an incoming call is playing
+        if (isCurrentlyInsistent() && !isInsistentUpdate(record)) {
+            return true;
+        }
+
+        // Suppressed since it's a non-interruptive update to a bubble-suppressed notification
+        final boolean isBubbleOrOverflowed = record.canBubble() && (record.isFlagBubbleRemoved()
+                || record.getNotification().isBubbleNotification());
+        if (record.isUpdate && !record.isInterruptive() && isBubbleOrOverflowed
+                && record.getNotification().getBubbleMetadata() != null) {
+            if (record.getNotification().getBubbleMetadata().isNotificationSuppressed()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @GuardedBy("mNotificationLock")
+    private boolean isLoopingRingtoneNotification(final NotificationRecord playingRecord) {
+        if (playingRecord != null) {
+            if (playingRecord.getAudioAttributes().getUsage() == USAGE_NOTIFICATION_RINGTONE
+                    && (playingRecord.getNotification().flags & FLAG_INSISTENT) != 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean playSound(final NotificationRecord record, Uri soundUri) {
+        final boolean shouldPlay;
+        if (focusExclusiveWithRecording()) {
+            // flagged path
+            shouldPlay = mAudioManager.shouldNotificationSoundPlay(record.getAudioAttributes());
+        } else {
+            // legacy path
+            // play notifications if there is no user of exclusive audio focus
+            // and the stream volume is not 0 (non-zero volume implies not silenced by SILENT or
+            //   VIBRATE ringer mode)
+            shouldPlay = !mAudioManager.isAudioFocusExclusive()
+                    && (mAudioManager.getStreamVolume(
+                        AudioAttributes.toLegacyStreamType(record.getAudioAttributes())) != 0);
+        }
+        if (!shouldPlay) {
+            if (DBG) Slog.v(TAG, "Not playing sound " + soundUri + " due to focus/volume");
+            return false;
+        }
+
+        boolean looping = (record.getNotification().flags & FLAG_INSISTENT) != 0;
+        final long identity = Binder.clearCallingIdentity();
+        try {
+            final IRingtonePlayer player = mAudioManager.getRingtonePlayer();
+            if (player != null) {
+                if (DBG) {
+                    Slog.v(TAG, "Playing sound " + soundUri
+                            + " with attributes " + record.getAudioAttributes());
+                }
+                player.playAsync(soundUri, record.getSbn().getUser(), looping,
+                        record.getAudioAttributes(), 1.0f);
+                return true;
+            }
+        } catch (RemoteException e) {
+        } finally {
+            Binder.restoreCallingIdentity(identity);
+        }
+        return false;
+    }
+
+    private boolean playVibration(final NotificationRecord record, final VibrationEffect effect,
+            boolean delayVibForSound) {
+        // Escalate privileges so we can use the vibrator even if the
+        // notifying app does not have the VIBRATE permission.
+        final long identity = Binder.clearCallingIdentity();
+        try {
+            if (delayVibForSound) {
+                new Thread(() -> {
+                    // delay the vibration by the same amount as the notification sound
+                    final int waitMs = mAudioManager.getFocusRampTimeMs(
+                            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK,
+                            record.getAudioAttributes());
+                    if (DBG) {
+                        Slog.v(TAG, "Delaying vibration for notification "
+                                + record.getKey() + " by " + waitMs + "ms");
+                    }
+                    try {
+                        Thread.sleep(waitMs);
+                    } catch (InterruptedException e) { }
+                    // Notifications might be canceled before it actually vibrates due to waitMs,
+                    // so need to check that the notification is still valid for vibrate.
+                    synchronized (mNotificationLock) {
+                        if (mNotificationsByKey.get(record.getKey()) != null) {
+                            if (record.getKey().equals(mVibrateNotificationKey)) {
+                                vibrate(record, effect, true);
+                            } else {
+                                if (DBG) {
+                                    Slog.v(TAG, "No vibration for notification "
+                                            + record.getKey() + ": a new notification is "
+                                            + "vibrating, or effects were cleared while waiting");
+                                }
+                            }
+                        } else {
+                            Slog.w(TAG, "No vibration for canceled notification "
+                                    + record.getKey());
+                        }
+                    }
+                }).start();
+            } else {
+                vibrate(record, effect, false);
+            }
+            return true;
+        } finally{
+            Binder.restoreCallingIdentity(identity);
+        }
+    }
+
+    private void vibrate(NotificationRecord record, VibrationEffect effect, boolean delayed) {
+        // We need to vibrate as "android" so we can breakthrough DND. VibratorManagerService
+        // doesn't have a concept of vibrating on an app's behalf, so add the app information
+        // to the reason so we can still debug from bugreports
+        String reason = "Notification (" + record.getSbn().getOpPkg() + " "
+                + record.getSbn().getUid() + ") " + (delayed ? "(Delayed)" : "");
+        mVibratorHelper.vibrate(effect, record.getAudioAttributes(), reason);
+    }
+
+    private boolean isNotificationForCurrentUser(NotificationRecord record) {
+        final int currentUser;
+        final long token = Binder.clearCallingIdentity();
+        try {
+            currentUser = ActivityManager.getCurrentUser();
+        } finally {
+            Binder.restoreCallingIdentity(token);
+        }
+        return (record.getUserId() == UserHandle.USER_ALL ||
+                record.getUserId() == currentUser ||
+                mUserProfiles.isCurrentProfile(record.getUserId()));
+    }
+
+    protected void playInCallNotification() {
+        final ContentResolver cr = getContext().getContentResolver();
+        if (mAudioManager.getRingerModeInternal() == AudioManager.RINGER_MODE_NORMAL
+                && Settings.Secure.getIntForUser(cr,
+                Settings.Secure.IN_CALL_NOTIFICATION_ENABLED, 1, cr.getUserId()) != 0) {
+            new Thread() {
+                @Override
+                public void run() {
+                    final long identity = Binder.clearCallingIdentity();
+                    try {
+                        final IRingtonePlayer player = mAudioManager.getRingtonePlayer();
+                        if (player != null) {
+                            if (mCallNotificationToken != null) {
+                                player.stop(mCallNotificationToken);
+                            }
+                            mCallNotificationToken = new Binder();
+                            player.play(mCallNotificationToken, mInCallNotificationUri,
+                                    mInCallNotificationAudioAttributes,
+                                    mInCallNotificationVolume, false);
+                        }
+                    } catch (RemoteException e) {
+                    } finally {
+                        Binder.restoreCallingIdentity(identity);
+                    }
+                }
+            }.start();
         }
     }
 
