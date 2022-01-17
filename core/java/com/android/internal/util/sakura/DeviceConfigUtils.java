@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.internal.util.evolution;
+package com.android.internal.util.sakura;
 
 import android.content.res.Resources;
 import android.os.SystemProperties;
