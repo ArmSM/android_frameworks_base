@@ -134,7 +134,6 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
 
     private boolean mIsVertical;
     private boolean mAlternativeOrder;
-    private boolean mUsingCustomLayout;
 
     private OverviewProxyService mOverviewProxyService;
     private int mNavBarMode = NAV_BAR_MODE_3BUTTON;
@@ -191,9 +190,11 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
     }
 
     private void onNavigationModeChanged(int mode) {
-        mNavBarMode = mode;
-        updateHint();
-        onLikelyDefaultLayoutChange();
+        if (mNavBarMode != mode) {
+            mNavBarMode = mode;
+            updateHint();
+            onLikelyDefaultLayoutChange(false);
+        }
     }
 
     @Override
@@ -226,6 +227,7 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
             } else {
                 setNavigationBarLayout("default");
             }
+            onLikelyDefaultLayoutChange(true);
         }
     }
 
@@ -235,23 +237,17 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
         updateLayoutInversion();
     }
 
-    private void setNavigationBarLayout(String layoutValue) {
-        if (!Objects.equals(mCurrentLayout, layoutValue)) {
-            mUsingCustomLayout = !layoutValue.equals("default");
+    private void setNavigationBarLayout(String layoutValue, boolean force) {
+        if (!Objects.equals(mCurrentLayout, layoutValue) || force) {
             clearViews();
             inflateLayout(layoutValue);
         }
     }
 
-    public void onLikelyDefaultLayoutChange() {
-        // Don't override custom layouts
-        if (mUsingCustomLayout) return;
-
-        // Reevaluate new layout
-        final String newValue = getDefaultLayout();
-        if (!Objects.equals(mCurrentLayout, newValue)) {
-            clearViews();
-            inflateLayout(newValue);
+    public void onLikelyDefaultLayoutChange(boolean force) {
+        setNavigationBarLayout(getDefaultLayout(), force);
+        if (!QuickStepContract.isGesturalMode(mNavBarMode)) {
+            setNavigationBarLayout(mNavBarLayout, force);
         }
     }
 
