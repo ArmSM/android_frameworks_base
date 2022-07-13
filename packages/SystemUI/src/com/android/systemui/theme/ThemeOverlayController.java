@@ -125,6 +125,8 @@ import javax.inject.Inject;
 @SysUISingleton
 public class ThemeOverlayController implements CoreStartable, Dumpable {
     protected static final String TAG = "ThemeOverlayController";
+    protected static final String OVERLAY_BERRY_BLACK_THEME =
+            "com.android.system.theme.black";
     private static final boolean DEBUG = true;
 
     private final ThemeOverlayApplier mThemeManager;
