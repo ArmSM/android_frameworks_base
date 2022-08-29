@@ -139,7 +139,7 @@ public abstract class QSPanelControllerBase<T extends QSPanel> extends ViewContr
                         setLayoutForMediaInScene();
                     } else {
                         switchTileLayoutIfNeeded();
-                        
+
                     switchTileLayoutIfNeeded();
                     if (mView.getTileLayout() != null) {
                         mView.getTileLayout().updateSettings();
@@ -180,11 +180,8 @@ public abstract class QSPanelControllerBase<T extends QSPanel> extends ViewContr
             QSLogger qsLogger,
             DumpManager dumpManager,
             SplitShadeStateController splitShadeStateController,
-<<<<<<< HEAD
             Provider<QSLongPressEffect> longPressEffectProvider
-=======
             TunerService tunerService
->>>>>>> b9f2d7b45800 (SystemUI: Add QS tile layout settings [1/2])
     ) {
         super(view);
         mHost = host;
@@ -261,6 +258,7 @@ public abstract class QSPanelControllerBase<T extends QSPanel> extends ViewContr
 
         mTunerService.addTunable(this, QSPanel.QS_TILE_VERTICAL_LAYOUT);
         mTunerService.addTunable(this, QSPanel.QS_TILE_LABEL_HIDE);
+        mTunerService.addTunable(this, QSPanel.QS_TILE_LABEL_SIZE);
         mTunerService.addTunable(this, QSPanel.QS_LAYOUT_COLUMNS);
         mTunerService.addTunable(this, QSPanel.QS_LAYOUT_COLUMNS_LANDSCAPE);
     }
@@ -628,6 +626,7 @@ public abstract class QSPanelControllerBase<T extends QSPanel> extends ViewContr
         switch (key) {
             case QSPanel.QS_TILE_VERTICAL_LAYOUT:
             case QSPanel.QS_TILE_LABEL_HIDE:
+            case QSPanel.QS_TILE_LABEL_SIZE:
             case QSPanel.QS_LAYOUT_COLUMNS:
             case QSPanel.QS_LAYOUT_COLUMNS_LANDSCAPE:
                 if (mView.getTileLayout() != null) {

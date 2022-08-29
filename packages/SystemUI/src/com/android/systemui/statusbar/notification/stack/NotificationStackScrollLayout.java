@@ -170,7 +170,7 @@ public class NotificationStackScrollLayout
     private static final int INVALID_POINTER = -1;
     private boolean mKeyguardBypassEnabled;
 
-    private final ExpandHelper mExpandHelper;
+    private final ExpandHelper mExpandHelper
     private NotificationSwipeHelper mSwipeHelper;
     private int mCurrentStackHeight = Integer.MAX_VALUE;
     private boolean mHighPriorityBeforeSpeedBump;
