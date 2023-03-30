@@ -2917,8 +2917,6 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
                 || mScreenOffAnimationController.shouldIgnoreKeyguardTouches();
     }
 
-<<<<<<< HEAD
-=======
     @Override
     public void onTuningChanged(String key, String newValue) {
         switch (key) {
@@ -2931,7 +2929,6 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
          }
     }
 
->>>>>>> d04cdec1dd30 (ScrimController: Use Tuner API to apply custom alpha)
     // Begin Extra BaseStatusBar methods.
 
     protected final CommandQueue mCommandQueue;
