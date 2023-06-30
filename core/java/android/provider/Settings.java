@@ -6384,6 +6384,10 @@ public final class Settings {
          * @hide
          */
         public static final String QS_SHOW_DATA_USAGE = "qs_show_data_usage";
+         * Haptic feedback on brightness slider
+         * @hide
+         */
+        public static final String QS_BRIGHTNESS_SLIDER_HAPTIC = "qs_brightness_slider_haptic";
 
         /**
          * Keys we no longer back up under the current schema, but want to continue to
