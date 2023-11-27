@@ -90,8 +90,8 @@ public class QSImpl implements QS, CommandQueue.Callbacks, StatusBarStateControl
     private static final String EXTRA_LISTENING = "listening";
     private static final String EXTRA_VISIBLE = "visible";
 
-    private static final String QS_TRANSPARENCY =
-            "system:" + Settings.System.QS_TRANSPARENCY;
+    private static final String QS_FOOTER_TRANSPARENCY =
+            "system:" + Settings.System.QS_FOOTER_TRANSPARENCY;
 
     private final Rect mQsBounds = new Rect();
     private final SysuiStatusBarStateController mStatusBarStateController;
@@ -305,7 +305,7 @@ public class QSImpl implements QS, CommandQueue.Callbacks, StatusBarStateControl
         // This will immediately call disable, so it needs to be added after setting up the fields.
         mCommandQueue.addCallback(this);
 
-        mTunerService.addTunable(this, QS_TRANSPARENCY);
+        mTunerService.addTunable(this, QS_FOOTER_TRANSPARENCY);
     }
 
     private void bindFooterActionsView(View root) {
@@ -447,7 +447,7 @@ public class QSImpl implements QS, CommandQueue.Callbacks, StatusBarStateControl
     @Override
     public void onTuningChanged(String key, String newValue) {
         switch (key) {
-            case QS_TRANSPARENCY:
+            case QS_FOOTER_TRANSPARENCY:
                 mCustomAlpha =
                         TunerService.parseInteger(newValue, 100) / 100f;
                 break;
