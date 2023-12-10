@@ -92,10 +92,9 @@ public class QuickQSPanel extends QSPanel {
         return !mExpanded;
     }
 
-    public void setMaxTiles(int maxTiles) {
-        Resources res = getResources();
+    public void setMaxTiles(int tiles) {
+        int maxTiles = tiles * TileUtils.getQSRowsCount(mContext);
         mColumns = TileUtils.getQSColumnsCount(mContext);
-        if (mColumns == 2) maxTiles = res.getInteger(R.integer.quick_qs_panel_max_tiles);
         if (maxTiles > mColumns && (maxTiles % mColumns != 0)) {
             maxTiles--;
             setMaxTiles(maxTiles);
@@ -114,6 +113,8 @@ public class QuickQSPanel extends QSPanel {
                 break;
             case QS_LAYOUT_COLUMNS:
             case QS_LAYOUT_COLUMNS_LANDSCAPE:
+            case QQS_LAYOUT_ROWS:
+            case QQS_LAYOUT_ROWS_LANDSCAPE:
                 setMaxTiles(mColumns);
                 super.onTuningChanged(key, newValue);
                 break;
@@ -209,7 +210,8 @@ public class QuickQSPanel extends QSPanel {
         public boolean updateResources() {
             mResourceCellHeightResId = R.dimen.qs_quick_tile_size;
             boolean b = super.updateResources();
-            mMaxAllowedRows = getResources().getInteger(R.integer.quick_qs_panel_max_rows);
+            mMaxAllowedRows = Math.max(TileUtils.getQSRowsCount(mContext),
+                    getResources().getInteger(R.integer.quick_qs_panel_max_rows));
             return b;
         }
 

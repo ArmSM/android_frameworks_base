@@ -96,7 +96,8 @@ public class TileLayout extends ViewGroup implements QSTileLayout {
     }
 
     @Override
-    public boolean setMinRows(int minRows) {
+    public boolean setMinRows(int rows) {
+        int minRows = Math.min(getResourceRows(), rows);
         if (mMinRows != minRows) {
             mMinRows = minRows;
             updateResources();
@@ -162,7 +163,7 @@ public class TileLayout extends ViewGroup implements QSTileLayout {
         int rows = useSmallLandscapeLockscreenResources()
                 ? res.getInteger(R.integer.small_land_lockscreen_quick_settings_max_rows)
                 : res.getInteger(R.integer.quick_settings_max_rows);
-        mMaxAllowedRows = Math.max(1, rows);
+        mMaxAllowedRows = Math.max(getResourceRows(), rows);
         if (mLessRows) {
             mMaxAllowedRows = Math.max(mMinRows, mMaxAllowedRows - 1);
         }
@@ -388,8 +389,13 @@ public class TileLayout extends ViewGroup implements QSTileLayout {
         return TileUtils.getQSColumnsCount(mContext);
     }
 
+    public int getResourceRows() {
+        return TileUtils.getQSRowsCount(mContext);
+    }
+
     @Override
     public void updateSettings() {
         updateResources();
+        requestLayout();
     }
 }
