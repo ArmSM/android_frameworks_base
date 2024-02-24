@@ -68,6 +68,7 @@ import com.android.systemui.animation.Expandable
 import com.android.systemui.animation.LaunchableView
 import com.android.systemui.animation.LaunchableViewDelegate
 import com.android.systemui.haptics.qs.QSLongPressEffect
+import com.android.systemui.animation.view.LaunchableLinearLayout
 import com.android.systemui.plugins.qs.QSIconView
 import com.android.systemui.plugins.qs.QSTile
 import com.android.systemui.plugins.qs.QSTile.AdapterState
@@ -298,7 +299,7 @@ constructor(
             val iconContainerSize = context.resources.getDimensionPixelSize(R.dimen.qs_quick_tile_size)
             radiusActive = iconContainerSize / 2f
             radiusInactive = iconContainerSize / 4f
-            iconContainer = LinearLayout(context)
+            iconContainer = LaunchableLinearLayout(context)
             iconContainer.layoutParams = LayoutParams(iconContainerSize, iconContainerSize)
             iconContainer.clipChildren = false
             iconContainer.clipToPadding = false
@@ -714,6 +715,10 @@ constructor(
 
     override fun setShouldBlockVisibilityChanges(block: Boolean) {
         launchableViewDelegate.setShouldBlockVisibilityChanges(block)
+    }
+
+    override fun getAnimatedView(): LaunchableView {
+        return if (isA11Style) getIconWithBackground() as LaunchableView else this
     }
 
     override fun setVisibility(visibility: Int) {
