@@ -36,9 +36,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.android.systemui.res.R;
+import com.android.systemui.sakura.header.StatusBarHeaderMachine;
 import com.android.systemui.shade.LargeScreenHeaderHelper;
 import com.android.systemui.util.LargeScreenUtils;
-import com.android.systemui.sakura.header.StatusBarHeaderMachine;
 
 import com.bosphere.fadingedgelayout.FadingEdgeLayout;
 
@@ -82,6 +82,10 @@ public class QuickStatusBarHeader extends FrameLayout
                     this, UserHandle.USER_ALL);
             }
 
+        void unobserve() {
+            getContext().getContentResolver().unregisterContentObserver(this);
+        }
+
         @Override
         public void onChange(boolean selfChange) {
             updateSettings();
@@ -92,7 +96,6 @@ public class QuickStatusBarHeader extends FrameLayout
     public QuickStatusBarHeader(Context context, AttributeSet attrs) {
         super(context, attrs);
         mStatusBarHeaderMachine = new StatusBarHeaderMachine(context);
-        mOmniSettingsObserver.observe();
     }
 
     @Override
@@ -125,12 +128,14 @@ public class QuickStatusBarHeader extends FrameLayout
         super.onAttachedToWindow();
         mStatusBarHeaderMachine.addObserver(this);
         mStatusBarHeaderMachine.updateEnablement();
+        mOmniSettingsObserver.observe();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mStatusBarHeaderMachine.removeObserver(this);
+        mOmniSettingsObserver.unobserve();
     }
 
     @Override
@@ -211,6 +216,7 @@ public class QuickStatusBarHeader extends FrameLayout
      */
     public int getSquishedHeight() {
         return mHeaderQsPanel.getSquishedHeight();
+    }
 
     @Override
     public void updateHeader(final Drawable headerImage, final boolean force) {
@@ -292,15 +298,15 @@ public class QuickStatusBarHeader extends FrameLayout
         int bottomFadeSize = (int) Math.round(headerHeight * 0.555);
 
         // Set the image header size
-        mHeaderImageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+        mHeaderImageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 
             headerHeight, getContext().getResources().getDisplayMetrics());
-        ViewGroup.MarginLayoutParams qsHeaderParams =
+        ViewGroup.MarginLayoutParams qsHeaderParams = 
             (ViewGroup.MarginLayoutParams) mQsHeaderLayout.getLayoutParams();
         qsHeaderParams.height = mHeaderImageHeight;
         mQsHeaderLayout.setLayoutParams(qsHeaderParams);
 
         // Set the image fade size (it has to be a 55,5% related to the main size)
-        mQsHeaderLayout.setFadeSizes(0,0,(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+        mQsHeaderLayout.setFadeSizes(0,0,(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 
             bottomFadeSize, getContext().getResources().getDisplayMetrics()), 0);
     }
 }
