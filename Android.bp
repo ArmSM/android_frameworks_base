@@ -429,7 +429,6 @@ java_defaults {
         "audiopolicy-aidl-java",
         "sounddose-aidl-java",
         "modules-utils-expresslog",
-<<<<<<< HEAD
         "perfetto_trace_javastream_protos_jarjar",
         "libaconfig_java_proto_nano",
         "aconfig_device_paths_java",
