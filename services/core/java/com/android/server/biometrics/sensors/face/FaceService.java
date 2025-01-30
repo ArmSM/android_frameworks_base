@@ -701,10 +701,13 @@ public class FaceService extends SystemService {
         private List<ServiceProvider> getProviders(
                 FaceSensorConfigurations faceSensorConfigurations) {
             final List<ServiceProvider> providers = new ArrayList<>();
+            /*
             final Pair<String, SensorProps[]> filteredSensorProps = filterAvailableHalInstances(
                             faceSensorConfigurations);
             providers.add(mFaceProviderFunction.getFaceProvider(filteredSensorProps,
                     faceSensorConfigurations.getResetLockoutRequiresChallenge()));
+            */
+            providers.addAll(getSenseProviders());
             return providers;
         }
 

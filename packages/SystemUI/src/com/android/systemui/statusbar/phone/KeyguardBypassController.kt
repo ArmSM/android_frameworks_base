@@ -150,7 +150,7 @@ class KeyguardBypassController @Inject constructor(
             val dismissByDefault = if (resources.getBoolean(
                             com.android.internal.R.bool.config_faceAuthDismissesKeyguard)) 1 else 0
             tunerService.addTunable({ key, _ ->
-                bypassEnabled = tunerService.getValue(key, dismissByDefault) != 0
+                bypassEnabledBiometric = tunerService.getValue(key, dismissByDefault) != 0
             }, Settings.Secure.FACE_UNLOCK_DISMISSES_KEYGUARD)
             lockscreenUserManager.addUserChangedListener(
                     object : NotificationLockscreenUserManager.UserChangedListener {
