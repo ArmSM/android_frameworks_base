@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2006 The Android Open Source Project
  *
@@ -6415,6 +6416,15 @@ public final class Settings {
          * @hide
          */
         public static final String STATUS_BAR_BATTERY_TEXT_CHARGING = "status_bar_battery_text_charging";
+
+         /**
+         * @hide
+         */
+        public static final String LOCKSCREEN_WEATHER_ENABLED = "lockscreen_weather_enabled";
+        /**
+         * @hide
+         */
+        public static final String LOCKSCREEN_WEATHER_LOCATION = "lockscreen_weather_location";
 
         /**
          * Keys we no longer back up under the current schema, but want to continue to
